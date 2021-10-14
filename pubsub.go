@@ -55,7 +55,7 @@ func (p PubSubClient) Topic(id string) IPubSubTopic {
 }
 
 type IPubSub interface {
-	SubmitResults(topicID string, submission *proto.Message) error
+	SubmitResults(topicID string, submission proto.Message) error
 	DecodeBody(body io.ReadCloser) ([]byte, error)
 }
 
