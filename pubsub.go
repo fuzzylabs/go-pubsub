@@ -55,7 +55,7 @@ func (p PubSubClient) Topic(id string) IPubSubTopic {
 }
 
 type IPubSub interface {
-	SubmitResults(topicID string, submission proto.Message) error
+	PublishMessage(topicID string, submission proto.Message) error
 	DecodeBody(body io.ReadCloser) ([]byte, error)
 }
 
@@ -66,7 +66,7 @@ type PubSub struct {
 }
 
 // NewPubSub returns a PubSub struct with a Pub/Sub client for a given Google Cloud project ID
-func NewPubSub(projectID string) (*PubSub, error) {
+func NewPubSub(projectID string) (IPubSub, error) {
 	ctx := context.Background()
 
 	client, err := pubsubapi.NewClient(ctx, projectID)
