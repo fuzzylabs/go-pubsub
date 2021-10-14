@@ -22,8 +22,8 @@ var _ IPubSub = &IPubSubMock{}
 // 			DecodeBodyFunc: func(body io.ReadCloser) ([]byte, error) {
 // 				panic("mock out the DecodeBody method")
 // 			},
-// 			SubmitResultsFunc: func(topicID string, submission *protoiface.MessageV1) error {
-// 				panic("mock out the PublishMessage method")
+// 			SubmitResultsFunc: func(topicID string, submission protoiface.MessageV1) error {
+// 				panic("mock out the SubmitResults method")
 // 			},
 // 		}
 //
@@ -35,8 +35,8 @@ type IPubSubMock struct {
 	// DecodeBodyFunc mocks the DecodeBody method.
 	DecodeBodyFunc func(body io.ReadCloser) ([]byte, error)
 
-	// SubmitResultsFunc mocks the PublishMessage method.
-	SubmitResultsFunc func(topicID string, submission *protoiface.MessageV1) error
+	// SubmitResultsFunc mocks the SubmitResults method.
+	SubmitResultsFunc func(topicID string, submission protoiface.MessageV1) error
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -45,12 +45,12 @@ type IPubSubMock struct {
 			// Body is the body argument value.
 			Body io.ReadCloser
 		}
-		// PublishMessage holds details about calls to the PublishMessage method.
+		// SubmitResults holds details about calls to the SubmitResults method.
 		SubmitResults []struct {
 			// TopicID is the topicID argument value.
 			TopicID string
 			// Submission is the submission argument value.
-			Submission *protoiface.MessageV1
+			Submission protoiface.MessageV1
 		}
 	}
 	lockDecodeBody    sync.RWMutex
@@ -88,14 +88,14 @@ func (mock *IPubSubMock) DecodeBodyCalls() []struct {
 	return calls
 }
 
-// PublishMessage calls SubmitResultsFunc.
-func (mock *IPubSubMock) SubmitResults(topicID string, submission *protoiface.MessageV1) error {
+// SubmitResults calls SubmitResultsFunc.
+func (mock *IPubSubMock) SubmitResults(topicID string, submission protoiface.MessageV1) error {
 	if mock.SubmitResultsFunc == nil {
-		panic("IPubSubMock.SubmitResultsFunc: method is nil but IPubSub.PublishMessage was just called")
+		panic("IPubSubMock.SubmitResultsFunc: method is nil but IPubSub.SubmitResults was just called")
 	}
 	callInfo := struct {
 		TopicID    string
-		Submission *protoiface.MessageV1
+		Submission protoiface.MessageV1
 	}{
 		TopicID:    topicID,
 		Submission: submission,
@@ -106,16 +106,16 @@ func (mock *IPubSubMock) SubmitResults(topicID string, submission *protoiface.Me
 	return mock.SubmitResultsFunc(topicID, submission)
 }
 
-// SubmitResultsCalls gets all the calls that were made to PublishMessage.
+// SubmitResultsCalls gets all the calls that were made to SubmitResults.
 // Check the length with:
 //     len(mockedIPubSub.SubmitResultsCalls())
 func (mock *IPubSubMock) SubmitResultsCalls() []struct {
 	TopicID    string
-	Submission *protoiface.MessageV1
+	Submission protoiface.MessageV1
 } {
 	var calls []struct {
 		TopicID    string
-		Submission *protoiface.MessageV1
+		Submission protoiface.MessageV1
 	}
 	mock.lockSubmitResults.RLock()
 	calls = mock.calls.SubmitResults
