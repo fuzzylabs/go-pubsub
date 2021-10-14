@@ -78,7 +78,7 @@ func NewPubSub(projectID string) (*PubSub, error) {
 }
 
 // PublishMessage publishes the message to the Pub/Sub topic
-func (p PubSub) PublishMessage(topicID string, message proto.Message) error {
+func (p *PubSub) PublishMessage(topicID string, message proto.Message) error {
 	messageBytes, err := json.Marshal(message)
 	if err != nil {
 		return err
@@ -119,7 +119,7 @@ type PushMessage struct {
 }
 
 // DecodeBody decodes the body of a push subscription request
-func (p PubSub) DecodeBody(body io.ReadCloser) ([]byte, error) {
+func (p *PubSub) DecodeBody(body io.ReadCloser) ([]byte, error) {
 	var pr PushMessage
 	if err := json.NewDecoder(body).Decode(&pr); err != nil {
 		return nil, err
