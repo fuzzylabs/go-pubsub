@@ -117,7 +117,8 @@ type Message struct {
 }
 
 type PushMessage struct {
-	Message Message
+	Message      Message
+	Subscription string
 }
 
 // DecodePushMessage decodes the body into a PushMessage

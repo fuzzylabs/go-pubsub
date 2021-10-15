@@ -93,6 +93,7 @@ func TestDecodePushMessage(t *testing.T) {
 	}
 
 	expected := &PushMessage{
+		Subscription: "projects/myproject/subscriptions/mysubscription",
 		Message: Message{
 			Attributes: map[string]interface{}{
 				"key": "value",
