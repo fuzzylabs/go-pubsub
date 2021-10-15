@@ -83,7 +83,10 @@ func TestDecodePushMessage(t *testing.T) {
    "subscription": "projects/myproject/subscriptions/mysubscription"
 }
 `
-	api, _ := NewPubSub("")
+	api, err := NewPubSubDecoder()
+	if err != nil {
+		t.Fatalf("Unexpected error creating PubSub: %s", err.Error())
+	}
 
 	reader := strings.NewReader(testMessage)
 	body := ioutil.NopCloser(reader)
@@ -123,7 +126,10 @@ func TestDecodeData(t *testing.T) {
    "subscription": "projects/myproject/subscriptions/mysubscription"
 }
 `
-	api, _ := NewPubSub("")
+	api, err := NewPubSubDecoder()
+	if err != nil {
+		t.Fatalf("Unexpected error creating PubSub: %s", err.Error())
+	}
 
 	reader := strings.NewReader(testMessage)
 	body := ioutil.NopCloser(reader)

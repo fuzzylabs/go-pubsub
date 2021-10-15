@@ -78,6 +78,11 @@ func NewPubSub(projectID string) (IPubSub, error) {
 	return &PubSub{ctx, PubSubClient{client}}, nil
 }
 
+// NewPubSubDecoder returns a PubSub struct without a Pub/Sub client, which is able to decode push-subscription messages
+func NewPubSubDecoder() (IPubSub, error) {
+	return &PubSub{}, nil
+}
+
 // PublishMessage publishes the message to the Pub/Sub topic
 func (p *PubSub) PublishMessage(topicID string, message proto.Message) error {
 	messageBytes, err := json.Marshal(message)

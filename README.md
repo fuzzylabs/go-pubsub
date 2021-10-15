@@ -39,7 +39,7 @@ import (
 
 func Entrypoint(w http.ResponseWriter, r *http.Request) {
 	projectID := "test"
-	pubsubApi, err := pubsub.NewPubSub(projectID)
+	pubsubApi, err := pubsub.NewPubSubDecoder()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
