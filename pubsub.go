@@ -56,7 +56,8 @@ func (p PubSubClient) Topic(id string) IPubSubTopic {
 
 type IPubSub interface {
 	PublishMessage(topicID string, submission proto.Message) error
-	DecodeBody(body io.ReadCloser) ([]byte, error)
+	DecodePushMessage(body io.ReadCloser) (*PushMessage, error)
+	DecodeData(body io.ReadCloser) ([]byte, error)
 }
 
 // PubSub a struct that holds a Pub/Sub client for publishing
@@ -112,14 +113,15 @@ func (p *PubSub) PublishMessage(topicID string, message proto.Message) error {
 type Message struct {
 	Attributes map[string]interface{}
 	Data       string
+	Bytes      []byte
 }
 
 type PushMessage struct {
 	Message Message
 }
 
-// DecodeBody decodes the body of a push subscription request
-func (p *PubSub) DecodeBody(body io.ReadCloser) ([]byte, error) {
+// DecodePushMessage decodes the body into a PushMessage
+func (p *PubSub) DecodePushMessage(body io.ReadCloser) (*PushMessage, error) {
 	var pr PushMessage
 	if err := json.NewDecoder(body).Decode(&pr); err != nil {
 		return nil, err
@@ -131,5 +133,17 @@ func (p *PubSub) DecodeBody(body io.ReadCloser) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	return data, nil
+
+	pr.Message.Bytes = data
+	return &pr, nil
+}
+
+// DecodeData decodes the body into a PushMessage and returns Data byte array
+func (p *PubSub) DecodeData(body io.ReadCloser) ([]byte, error) {
+	pr, err := p.DecodePushMessage(body)
+	if err != nil {
+		return nil, err
+	}
+
+	return pr.Message.Bytes, nil
 }

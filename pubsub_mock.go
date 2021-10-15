@@ -19,8 +19,11 @@ var _ IPubSub = &IPubSubMock{}
 //
 // 		// make and configure a mocked IPubSub
 // 		mockedIPubSub := &IPubSubMock{
-// 			DecodeBodyFunc: func(body io.ReadCloser) ([]byte, error) {
-// 				panic("mock out the DecodeBody method")
+// 			DecodeDataFunc: func(body io.ReadCloser) ([]byte, error) {
+// 				panic("mock out the DecodeData method")
+// 			},
+// 			DecodePushMessageFunc: func(body io.ReadCloser) (*PushMessage, error) {
+// 				panic("mock out the DecodePushMessage method")
 // 			},
 // 			PublishMessageFunc: func(topicID string, submission protoiface.MessageV1) error {
 // 				panic("mock out the PublishMessage method")
@@ -32,16 +35,24 @@ var _ IPubSub = &IPubSubMock{}
 //
 // 	}
 type IPubSubMock struct {
-	// DecodeBodyFunc mocks the DecodeBody method.
-	DecodeBodyFunc func(body io.ReadCloser) ([]byte, error)
+	// DecodeDataFunc mocks the DecodeData method.
+	DecodeDataFunc func(body io.ReadCloser) ([]byte, error)
+
+	// DecodePushMessageFunc mocks the DecodePushMessage method.
+	DecodePushMessageFunc func(body io.ReadCloser) (*PushMessage, error)
 
 	// PublishMessageFunc mocks the PublishMessage method.
 	PublishMessageFunc func(topicID string, submission protoiface.MessageV1) error
 
 	// calls tracks calls to the methods.
 	calls struct {
-		// DecodeBody holds details about calls to the DecodeBody method.
-		DecodeBody []struct {
+		// DecodeData holds details about calls to the DecodeData method.
+		DecodeData []struct {
+			// Body is the body argument value.
+			Body io.ReadCloser
+		}
+		// DecodePushMessage holds details about calls to the DecodePushMessage method.
+		DecodePushMessage []struct {
 			// Body is the body argument value.
 			Body io.ReadCloser
 		}
@@ -53,38 +64,70 @@ type IPubSubMock struct {
 			Submission protoiface.MessageV1
 		}
 	}
-	lockDecodeBody     sync.RWMutex
-	lockPublishMessage sync.RWMutex
+	lockDecodeData        sync.RWMutex
+	lockDecodePushMessage sync.RWMutex
+	lockPublishMessage    sync.RWMutex
 }
 
-// DecodeBody calls DecodeBodyFunc.
-func (mock *IPubSubMock) DecodeBody(body io.ReadCloser) ([]byte, error) {
-	if mock.DecodeBodyFunc == nil {
-		panic("IPubSubMock.DecodeBodyFunc: method is nil but IPubSub.DecodeBody was just called")
+// DecodeData calls DecodeDataFunc.
+func (mock *IPubSubMock) DecodeData(body io.ReadCloser) ([]byte, error) {
+	if mock.DecodeDataFunc == nil {
+		panic("IPubSubMock.DecodeDataFunc: method is nil but IPubSub.DecodeData was just called")
 	}
 	callInfo := struct {
 		Body io.ReadCloser
 	}{
 		Body: body,
 	}
-	mock.lockDecodeBody.Lock()
-	mock.calls.DecodeBody = append(mock.calls.DecodeBody, callInfo)
-	mock.lockDecodeBody.Unlock()
-	return mock.DecodeBodyFunc(body)
+	mock.lockDecodeData.Lock()
+	mock.calls.DecodeData = append(mock.calls.DecodeData, callInfo)
+	mock.lockDecodeData.Unlock()
+	return mock.DecodeDataFunc(body)
 }
 
-// DecodeBodyCalls gets all the calls that were made to DecodeBody.
+// DecodeDataCalls gets all the calls that were made to DecodeData.
 // Check the length with:
-//     len(mockedIPubSub.DecodeBodyCalls())
-func (mock *IPubSubMock) DecodeBodyCalls() []struct {
+//     len(mockedIPubSub.DecodeDataCalls())
+func (mock *IPubSubMock) DecodeDataCalls() []struct {
 	Body io.ReadCloser
 } {
 	var calls []struct {
 		Body io.ReadCloser
 	}
-	mock.lockDecodeBody.RLock()
-	calls = mock.calls.DecodeBody
-	mock.lockDecodeBody.RUnlock()
+	mock.lockDecodeData.RLock()
+	calls = mock.calls.DecodeData
+	mock.lockDecodeData.RUnlock()
+	return calls
+}
+
+// DecodePushMessage calls DecodePushMessageFunc.
+func (mock *IPubSubMock) DecodePushMessage(body io.ReadCloser) (*PushMessage, error) {
+	if mock.DecodePushMessageFunc == nil {
+		panic("IPubSubMock.DecodePushMessageFunc: method is nil but IPubSub.DecodePushMessage was just called")
+	}
+	callInfo := struct {
+		Body io.ReadCloser
+	}{
+		Body: body,
+	}
+	mock.lockDecodePushMessage.Lock()
+	mock.calls.DecodePushMessage = append(mock.calls.DecodePushMessage, callInfo)
+	mock.lockDecodePushMessage.Unlock()
+	return mock.DecodePushMessageFunc(body)
+}
+
+// DecodePushMessageCalls gets all the calls that were made to DecodePushMessage.
+// Check the length with:
+//     len(mockedIPubSub.DecodePushMessageCalls())
+func (mock *IPubSubMock) DecodePushMessageCalls() []struct {
+	Body io.ReadCloser
+} {
+	var calls []struct {
+		Body io.ReadCloser
+	}
+	mock.lockDecodePushMessage.RLock()
+	calls = mock.calls.DecodePushMessage
+	mock.lockDecodePushMessage.RUnlock()
 	return calls
 }
 

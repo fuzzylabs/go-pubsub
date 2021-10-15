@@ -68,7 +68,7 @@ func TestSubmitResults(t *testing.T) {
 	}
 }
 
-func TestDecodeBody(t *testing.T) {
+func TestDecodePushMessage(t *testing.T) {
 	testMessage := `{
     "message": {
         "attributes": {
@@ -87,14 +87,53 @@ func TestDecodeBody(t *testing.T) {
 
 	reader := strings.NewReader(testMessage)
 	body := ioutil.NopCloser(reader)
-	got, err := api.DecodeBody(body)
+	got, err := api.DecodePushMessage(body)
+	if err != nil {
+		t.Fatalf("Unexpected error while parsing a request body: %s", err.Error())
+	}
+
+	expected := &PushMessage{
+		Message: Message{
+			Attributes: map[string]interface{}{
+				"key": "value",
+			},
+			Data:  "SGVsbG8gQ2xvdWQgUHViL1N1YiEgSGVyZSBpcyBteSBtZXNzYWdlIQ==",
+			Bytes: []byte("Hello Cloud Pub/Sub! Here is my message!"),
+		},
+	}
+	if !cmp.Equal(expected, got) {
+		t.Fatalf("Expected message:\n%v\nbut got:\n%v", expected, got)
+	}
+
+}
+
+func TestDecodeData(t *testing.T) {
+	testMessage := `{
+    "message": {
+        "attributes": {
+            "key": "value"
+        },
+        "data": "SGVsbG8gQ2xvdWQgUHViL1N1YiEgSGVyZSBpcyBteSBtZXNzYWdlIQ==",
+        "messageId": "2070443601311540",
+        "message_id": "2070443601311540",
+        "publishTime": "2021-02-26T19:13:55.749Z",
+        "publish_time": "2021-02-26T19:13:55.749Z"
+    },
+   "subscription": "projects/myproject/subscriptions/mysubscription"
+}
+`
+	api, _ := NewPubSub("")
+
+	reader := strings.NewReader(testMessage)
+	body := ioutil.NopCloser(reader)
+	got, err := api.DecodeData(body)
 	if err != nil {
 		t.Fatalf("Unexpected error while parsing a request body: %s", err.Error())
 	}
 
 	expected := []byte("Hello Cloud Pub/Sub! Here is my message!")
 	if !cmp.Equal(expected, got) {
-		t.Fatalf("Expected message: %s, but got: %s", string(expected), string(got))
+		t.Fatalf("Expected message:\n%v\nbut got:\n%v", expected, got)
 	}
 
 }
