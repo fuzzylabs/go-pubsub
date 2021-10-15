@@ -45,7 +45,7 @@ func Entrypoint(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	
-	message, err := pubsubApi.DecodeBody(r.Body)
+	message, err := pubsubApi.DecodeData(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
