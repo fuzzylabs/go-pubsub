@@ -10,6 +10,7 @@ import (
 	"fmt"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"io"
 )
@@ -85,8 +86,7 @@ func NewPubSubDecoder() (IPubSub, error) {
 }
 
 // PublishMessage publishes the message to the Pub/Sub topic
-//TODO should use proto.Message instead
-func (p *PubSub) PublishMessage(topicID string, message protoreflect.ProtoMessage) error {
+func (p *PubSub) PublishMessage(topicID string, message proto.Message) error {
 	messageBytes, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(message)
 	if err != nil {
 		return err
