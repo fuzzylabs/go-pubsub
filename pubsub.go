@@ -11,7 +11,6 @@ import (
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/reflect/protoreflect"
 	"io"
 )
 
@@ -57,7 +56,7 @@ func (p PubSubClient) Topic(id string) IPubSubTopic {
 }
 
 type IPubSub interface {
-	PublishMessage(topicID string, submission protoreflect.ProtoMessage) error
+	PublishMessage(topicID string, submission proto.Message) error
 	DecodePushMessage(body io.ReadCloser) (*PushMessage, error)
 	DecodeData(body io.ReadCloser) ([]byte, error)
 }
