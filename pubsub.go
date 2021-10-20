@@ -8,8 +8,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/golang/protobuf/proto"
 	log "github.com/sirupsen/logrus"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/proto"
 	"io"
 )
 
@@ -85,7 +86,7 @@ func NewPubSubDecoder() (IPubSub, error) {
 
 // PublishMessage publishes the message to the Pub/Sub topic
 func (p *PubSub) PublishMessage(topicID string, message proto.Message) error {
-	messageBytes, err := json.Marshal(message)
+	messageBytes, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(message)
 	if err != nil {
 		return err
 	}

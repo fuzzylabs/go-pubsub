@@ -4,7 +4,7 @@
 package go_pubsub
 
 import (
-	"google.golang.org/protobuf/runtime/protoiface"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"io"
 	"sync"
 )
@@ -25,7 +25,7 @@ var _ IPubSub = &IPubSubMock{}
 // 			DecodePushMessageFunc: func(body io.ReadCloser) (*PushMessage, error) {
 // 				panic("mock out the DecodePushMessage method")
 // 			},
-// 			PublishMessageFunc: func(topicID string, submission protoiface.MessageV1) error {
+// 			PublishMessageFunc: func(topicID string, submission protoreflect.ProtoMessage) error {
 // 				panic("mock out the PublishMessage method")
 // 			},
 // 		}
@@ -42,7 +42,7 @@ type IPubSubMock struct {
 	DecodePushMessageFunc func(body io.ReadCloser) (*PushMessage, error)
 
 	// PublishMessageFunc mocks the PublishMessage method.
-	PublishMessageFunc func(topicID string, submission protoiface.MessageV1) error
+	PublishMessageFunc func(topicID string, submission protoreflect.ProtoMessage) error
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -61,7 +61,7 @@ type IPubSubMock struct {
 			// TopicID is the topicID argument value.
 			TopicID string
 			// Submission is the submission argument value.
-			Submission protoiface.MessageV1
+			Submission protoreflect.ProtoMessage
 		}
 	}
 	lockDecodeData        sync.RWMutex
@@ -132,13 +132,13 @@ func (mock *IPubSubMock) DecodePushMessageCalls() []struct {
 }
 
 // PublishMessage calls PublishMessageFunc.
-func (mock *IPubSubMock) PublishMessage(topicID string, submission protoiface.MessageV1) error {
+func (mock *IPubSubMock) PublishMessage(topicID string, submission protoreflect.ProtoMessage) error {
 	if mock.PublishMessageFunc == nil {
 		panic("IPubSubMock.PublishMessageFunc: method is nil but IPubSub.PublishMessage was just called")
 	}
 	callInfo := struct {
 		TopicID    string
-		Submission protoiface.MessageV1
+		Submission protoreflect.ProtoMessage
 	}{
 		TopicID:    topicID,
 		Submission: submission,
@@ -154,11 +154,11 @@ func (mock *IPubSubMock) PublishMessage(topicID string, submission protoiface.Me
 //     len(mockedIPubSub.PublishMessageCalls())
 func (mock *IPubSubMock) PublishMessageCalls() []struct {
 	TopicID    string
-	Submission protoiface.MessageV1
+	Submission protoreflect.ProtoMessage
 } {
 	var calls []struct {
 		TopicID    string
-		Submission protoiface.MessageV1
+		Submission protoreflect.ProtoMessage
 	}
 	mock.lockPublishMessage.RLock()
 	calls = mock.calls.PublishMessage
